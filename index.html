@@ -1099,54 +1099,16 @@
             return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Login - SDK أولاً، REST API احتياط، مع تخزين مؤقت
-        async function _fetchDeliveryBoys() {
-            // 1. حاول من localStorage (أي عمر، إذا فشلت كل الطرق)
-            function fromCache() {
+        // Login - SDK فقط مع إعادة محاولة (نفس اللي كان شغال قبل)
+        async function _fetchDeliveryBoys(retries = 3) {
+            for (let i = 0; i < retries; i++) {
                 try {
-                    const c = localStorage.getItem('_dbCache');
-                    if (c) { const p = JSON.parse(c); if (p.docs.length) return p.docs; }
-                } catch(e) {}
-                return null;
-            }
-
-            // 2. جرب SDK (WebSocket - أسرع وما له حصة منفصلة)
-            try {
-                const snap = await db.collection('deliveryBoys').get();
-                if (!snap.empty) {
-                    const docs = snap.docs.map(d => {
-                        const data = d.data();
-                        return {
-                            fields: Object.fromEntries(Object.entries(data).map(([k,v]) => [
-                                k, typeof v === 'string' ? {stringValue: v} :
-                                   typeof v === 'boolean' ? {booleanValue: v} :
-                                   typeof v === 'number' ? {integerValue: String(v)} : {stringValue: String(v)}
-                            ])),
-                            name: 'projects/_/databases/(default)/documents/deliveryBoys/' + d.id
-                        };
-                    });
-                    localStorage.setItem('_dbCache', JSON.stringify({ ts: Date.now(), docs }));
-                    return docs;
+                    const snap = await db.collection('deliveryBoys').get({ source: 'server' });
+                    if (!snap.empty) return snap.docs.map(d => ({ id: d.id, data: () => d.data() }));
+                } catch (e) {
+                    if (i === retries - 1) throw e;
+                    await new Promise(r => setTimeout(r, 1000 * (i + 1)));
                 }
-            } catch (e) { console.warn('SDK failed:', e); }
-
-            // 3. REST API (مع مراعاة الحصة)
-            try {
-                const res = await fetch(`${FB_BASE}/deliveryBoys?key=${API_KEY}`);
-                if (res.status === 429) {
-                    const cached = fromCache();
-                    if (cached) return cached;
-                    throw new Error('الحد المسموح من الطلبات تجاوز، افتح الصفحة من جديد بعد دقيقة');
-                }
-                const data = await res.json();
-                if (data.error) throw new Error(data.error.message);
-                const docs = data.documents || [];
-                localStorage.setItem('_dbCache', JSON.stringify({ ts: Date.now(), docs }));
-                return docs;
-            } catch (e) {
-                const cached = fromCache();
-                if (cached) return cached;
-                throw e;
             }
         }
 
@@ -1180,27 +1142,23 @@
                 const allDocs = await _fetchDeliveryBoys();
 
                 const uOriginal = uInput.value.trim();
-                const matchedDocs = allDocs.filter(doc => {
-                    const f = doc.fields || {};
-                    const storedUser = (f.username?.stringValue || '').trim();
+                const matchedDocs = allDocs.filter(d => {
+                    const data = d.data();
+                    const storedUser = (data.username || '').trim();
                     return storedUser === uOriginal || storedUser.toLowerCase() === u;
                 });
 
                 if (matchedDocs.length === 0) {
-                    const sampleNames = allDocs.slice(0, 3).map(d => (d.fields?.username?.stringValue || '?')).join(', ');
-                    errEl.textContent = allDocs.length === 0
-                        ? 'لا يوجد موصلون في النظام بعد'
-                        : `اسم المستخدم غير موجود. الأسماء الموجودة: ${sampleNames}`;
+                    errEl.textContent = 'اسم المستخدم غير موجود، تأكد من الكتابة';
                     errEl.style.display = 'block';
                     btn.disabled = false;
                     document.getElementById('loginBtnText').textContent = 'دخول ⚡';
                     return;
                 }
 
-                const doc = matchedDocs[0];
-                const fields = doc.fields || {};
-                const docId = doc.name.split('/').pop();
-                const storedPass = fields.password?.stringValue || '';
+                const docData = matchedDocs[0].data();
+                const docId = matchedDocs[0].id;
+                const storedPass = docData.password || '';
 
                 // مقارنة كلمة المرور
                 const pOriginal = pInput.value.trim();
@@ -1236,15 +1194,7 @@
                     return;
                 }
 
-                // نجح الدخول — نبني object بنفس شكل SDK
-                const docData = {};
-                for (const [k, v] of Object.entries(fields)) {
-                    if (v.stringValue !== undefined) docData[k] = v.stringValue;
-                    else if (v.booleanValue !== undefined) docData[k] = v.booleanValue;
-                    else if (v.integerValue !== undefined) docData[k] = Number(v.integerValue);
-                    else if (v.doubleValue !== undefined) docData[k] = Number(v.doubleValue);
-                }
-
+                // نجح الدخول
                 _lAttempts.count = 0;
                 currentDriverId = docId;
                 currentDriver = docData;
