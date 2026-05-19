@@ -1162,30 +1162,31 @@
 
                 // جرب كل الطرق الممكنة لمطابقة كلمة المرور
                 const pOriginal = document.getElementById('pInput').value.trim();
-                const hashedP = await _hashPass(pOriginal);
-                const hashedPLower = await _hashPass(pOriginal.toLowerCase());
+                let hashedP = '', hashedPLower = '';
+                try {
+                    hashedP = await _hashPass(pOriginal);
+                    hashedPLower = await _hashPass(pOriginal.toLowerCase());
+                } catch (hashErr) {
+                    console.error('Hash error:', hashErr);
+                }
 
                 if (storedPass.length === 64) {
-                    // مشفرة - جرب الهاش المباشر والهاش بالأحرف الصغيرة
                     match = (hashedP === storedPass) || (hashedPLower === storedPass);
-                    // إذا فشلت، جرب المقارنة كنص عادي (احتمال الباسورد محفوظ نص عادي)
                     if (!match) match = (pOriginal === storedPass);
                 } else {
-                    // نص عادي - جرب مباشرة ومع/بدون مسافات
                     match = (pOriginal === storedPass) || (pOriginal.trim() === storedPass.trim());
-                    // إذا فشلت، جرب الهاش (احتمال الباسورد مشفر)
                     if (!match) match = (hashedP === storedPass) || (hashedPLower === storedPass);
                 }
 
                 if (!match) {
+                    console.log('DEBUG: storedPass length=', storedPass.length, 'stored=', storedPass.substring(0,16)+'...', 'hashedP=', hashedP.substring(0,16)+'...', 'hashedPLower=', hashedPLower.substring(0,16)+'...', 'match=', match);
                     _lAttempts.count++;
                     if (_lAttempts.count >= _MAX_ATT) {
                         _lAttempts.lockedUntil = Date.now() + _LOCK_MS;
                         _lAttempts.count = 0;
                         errEl.textContent = 'تم تجاوز عدد المحاولات. حاول بعد 10 دقائق.';
                     } else {
-                        const remaining = _MAX_ATT - _lAttempts.count;
-                        errEl.textContent = `كلمة المرور غير صحيحة (${remaining} محاولة متبقية)`;
+                        errEl.textContent = `كلمة المرور غير صحيحة (حاول مرة أخرى)`;
                     }
                     errEl.style.display = 'block';
                     btn.disabled = false;
