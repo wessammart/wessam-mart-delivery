@@ -1099,30 +1099,55 @@
             return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Login - REST API أولاً مع تخزين مؤقت
+        // Login - SDK أولاً، REST API احتياط، مع تخزين مؤقت
         async function _fetchDeliveryBoys() {
-            // حاول من localStorage أولاً (صلاحية 30 ثانية)
-            const cached = localStorage.getItem('_dbCache');
-            if (cached) {
+            // 1. حاول من localStorage (أي عمر، إذا فشلت كل الطرق)
+            function fromCache() {
                 try {
-                    const parsed = JSON.parse(cached);
-                    if (Date.now() - parsed.ts < 30000) return parsed.docs;
-                } catch (e) {}
+                    const c = localStorage.getItem('_dbCache');
+                    if (c) { const p = JSON.parse(c); if (p.docs.length) return p.docs; }
+                } catch(e) {}
+                return null;
             }
-            const res = await fetch(`${FB_BASE}/deliveryBoys?key=${API_KEY}`);
-            if (res.status === 429) {
-                const cached2 = localStorage.getItem('_dbCache');
-                if (cached2) {
-                    const p = JSON.parse(cached2);
-                    if (p.docs.length > 0) return p.docs;
+
+            // 2. جرب SDK (WebSocket - أسرع وما له حصة منفصلة)
+            try {
+                const snap = await db.collection('deliveryBoys').get();
+                if (!snap.empty) {
+                    const docs = snap.docs.map(d => {
+                        const data = d.data();
+                        return {
+                            fields: Object.fromEntries(Object.entries(data).map(([k,v]) => [
+                                k, typeof v === 'string' ? {stringValue: v} :
+                                   typeof v === 'boolean' ? {booleanValue: v} :
+                                   typeof v === 'number' ? {integerValue: String(v)} : {stringValue: String(v)}
+                            ])),
+                            name: 'projects/_/databases/(default)/documents/deliveryBoys/' + d.id
+                        };
+                    });
+                    localStorage.setItem('_dbCache', JSON.stringify({ ts: Date.now(), docs }));
+                    return docs;
                 }
-                throw new Error('الحد المسموح من الطلبات تجاوز، حاول بعد دقيقة');
+            } catch (e) { console.warn('SDK failed:', e); }
+
+            // 3. REST API (مع مراعاة الحصة)
+            try {
+                const res = await fetch(`${FB_BASE}/deliveryBoys?key=${API_KEY}`);
+                if (res.status === 429) {
+                    const cached = fromCache();
+                    if (cached) return cached;
+                    throw new Error('الحد المسموح من الطلبات تجاوز، افتح الصفحة من جديد بعد دقيقة');
+                }
+                const data = await res.json();
+                if (data.error) throw new Error(data.error.message);
+                const docs = data.documents || [];
+                localStorage.setItem('_dbCache', JSON.stringify({ ts: Date.now(), docs }));
+                return docs;
+            } catch (e) {
+                const cached = fromCache();
+                if (cached) return cached;
+                throw e;
             }
-            const data = await res.json();
-            if (data.error) throw new Error(data.error.message);
-            const docs = data.documents || [];
-            localStorage.setItem('_dbCache', JSON.stringify({ ts: Date.now(), docs: docs }));
-            return docs;
         }
 
         async function doLogin() {
@@ -1227,7 +1252,8 @@
 
             } catch (e) {
                 console.error('Login error:', e);
-                errEl.textContent = 'خطأ في الاتصال، تأكد من الإنترنت وحاول مجدداً';
+                const isQuota = e.message && e.message.includes('Quota');
+                errEl.textContent = isQuota ? 'حصة Firebase مؤقتاً مرتفعة، حاول مرة أخرى بعد دقيقة' : (e.message || 'خطأ في الاتصال');
                 errEl.style.display = 'block';
                 btn.disabled = false;
                 document.getElementById('loginBtnText').textContent = 'دخول ⚡';
