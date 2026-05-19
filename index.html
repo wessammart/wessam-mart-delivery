@@ -1099,7 +1099,32 @@
             return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Login - يستخدم REST API (يتجاوز مشكلة WebChannel 404)
+        // Login - REST API أولاً مع تخزين مؤقت
+        async function _fetchDeliveryBoys() {
+            // حاول من localStorage أولاً (صلاحية 30 ثانية)
+            const cached = localStorage.getItem('_dbCache');
+            if (cached) {
+                try {
+                    const parsed = JSON.parse(cached);
+                    if (Date.now() - parsed.ts < 30000) return parsed.docs;
+                } catch (e) {}
+            }
+            const res = await fetch(`${FB_BASE}/deliveryBoys?key=${API_KEY}`);
+            if (res.status === 429) {
+                const cached2 = localStorage.getItem('_dbCache');
+                if (cached2) {
+                    const p = JSON.parse(cached2);
+                    if (p.docs.length > 0) return p.docs;
+                }
+                throw new Error('الحد المسموح من الطلبات تجاوز، حاول بعد دقيقة');
+            }
+            const data = await res.json();
+            if (data.error) throw new Error(data.error.message);
+            const docs = data.documents || [];
+            localStorage.setItem('_dbCache', JSON.stringify({ ts: Date.now(), docs: docs }));
+            return docs;
+        }
+
         async function doLogin() {
             const uInput = document.getElementById('uInput');
             const pInput = document.getElementById('pInput');
@@ -1127,21 +1152,9 @@
             document.getElementById('loginBtnText').innerHTML = '<span class="spinner" style="display:inline-block;vertical-align:middle;margin-left:6px;"></span> جاري الدخول...';
 
             try {
-                // جلب كل الموصلين عبر REST API (يتجنب WebChannel)
-                const res = await fetch(`${FB_BASE}/deliveryBoys?key=${API_KEY}`);
-                const data = await res.json();
+                const allDocs = await _fetchDeliveryBoys();
 
-                if (data.error) {
-                    errEl.textContent = 'خطأ في الاتصال: ' + data.error.message;
-                    errEl.style.display = 'block';
-                    btn.disabled = false;
-                    document.getElementById('loginBtnText').textContent = 'دخول ⚡';
-                    return;
-                }
-
-                // البحث عن الموصل المطابق
                 const uOriginal = uInput.value.trim();
-                const allDocs = data.documents || [];
                 const matchedDocs = allDocs.filter(doc => {
                     const f = doc.fields || {};
                     const storedUser = (f.username?.stringValue || '').trim();
