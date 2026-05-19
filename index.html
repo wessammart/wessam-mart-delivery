@@ -1200,9 +1200,11 @@
                 enterDashboard();
 
             } catch (e) {
-                // خطأ في الشبكة أو Firebase - لا نعاقب المستخدم
                 console.error('Login error:', e);
-                errEl.textContent = 'خطأ في الاتصال، تأكد من الإنترنت وحاول مجدداً';
+                const msg = e.code === 'permission-denied'
+                    ? 'صلاحيات قاعدة البيانات غير كافية، تواصل مع مدير النظام'
+                    : (e.message || 'خطأ في الاتصال، تأكد من الإنترنت وحاول مجدداً');
+                errEl.textContent = msg;
                 errEl.style.display = 'block';
                 btn.disabled = false;
                 document.getElementById('loginBtnText').textContent = 'دخول ⚡';
