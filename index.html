@@ -1101,15 +1101,37 @@
             return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Login - SDK فقط مع إعادة محاولة (نفس اللي كان شغال قبل)
-        async function _fetchDeliveryBoys(retries = 3) {
-            for (let i = 0; i < retries; i++) {
+        // Login - SDK أولاً، localStorage احتياط
+        function _cacheKey() { return '_deliveryBoys_' + window.location.origin; }
+
+        async function _fetchDeliveryBoys() {
+            // 1. جرب localStorage (مدة غير محدودة، آخر بيانات ناجحة)
+            try {
+                const raw = localStorage.getItem(_cacheKey());
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    if (parsed.docs && parsed.docs.length) {
+                        return parsed.docs.map(d => ({ id: d.id, data: () => d.data }));
+                    }
+                }
+            } catch (e) {}
+
+            // 2. جرب SDK (مع 3 محاولات)
+            for (let i = 0; i < 3; i++) {
                 try {
-                    const snap = await 
- db.collection('deliveryBoys').get();
-                    if (!snap.empty) return snap.docs.map(d => ({ id: d.id, data: () => d.data() }));
+                    const snap = await db.collection('deliveryBoys').get();
+                    if (!snap.empty) {
+                        const docs = snap.docs.map(d => ({ id: d.id, data: () => d.data() }));
+                        // خزّن في localStorage
+                        try {
+                            localStorage.setItem(_cacheKey(), JSON.stringify({
+                                docs: docs.map(d => ({ id: d.id, data: d.data() }))
+                            }));
+                        } catch (e) {}
+                        return docs;
+                    }
                 } catch (e) {
-                    if (i === retries - 1) throw e;
+                    if (i === 2) throw e;
                     await new Promise(r => setTimeout(r, 1000 * (i + 1)));
                 }
             }
@@ -1205,8 +1227,7 @@
 
             } catch (e) {
                 console.error('Login error:', e);
-                const isQuota = e.message && e.message.includes('Quota');
-                errEl.textContent = isQuota ? 'حصة Firebase مؤقتاً مرتفعة، حاول مرة أخرى بعد دقيقة' : (e.message || 'خطأ في الاتصال');
+                errEl.textContent = 'تعذر الاتصال. تحقق من اتصالك بالإنترنت وحاول مجدداً.';
                 errEl.style.display = 'block';
                 btn.disabled = false;
                 document.getElementById('loginBtnText').textContent = 'دخول ⚡';
