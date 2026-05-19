@@ -1009,6 +1009,8 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        // persistence عشان يقدر يجيب البيانات من الكاش حتى لو النت ضعيف
+        try { db.enablePersistence({ synchronizeTabs: true }); } catch(e) {}
         const API_KEY = 'AIzaSyA2N_lsZ7yyvT1kIydXFkW_fLVFH0kQRBk';
         const FB_BASE = 'https://firestore.googleapis.com/v1/projects/wessam-8ac1d/databases/(default)/documents';
 
@@ -1103,7 +1105,8 @@
         async function _fetchDeliveryBoys(retries = 3) {
             for (let i = 0; i < retries; i++) {
                 try {
-                    const snap = await db.collection('deliveryBoys').get({ source: 'server' });
+                    const snap = await 
+ db.collection('deliveryBoys').get();
                     if (!snap.empty) return snap.docs.map(d => ({ id: d.id, data: () => d.data() }));
                 } catch (e) {
                     if (i === retries - 1) throw e;
