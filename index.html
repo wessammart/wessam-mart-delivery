@@ -1141,14 +1141,18 @@
 
                 // البحث عن الموصل المطابق
                 const uOriginal = uInput.value.trim();
-                const matchedDocs = (data.documents || []).filter(doc => {
+                const allDocs = data.documents || [];
+                const matchedDocs = allDocs.filter(doc => {
                     const f = doc.fields || {};
                     const storedUser = (f.username?.stringValue || '').trim();
                     return storedUser === uOriginal || storedUser.toLowerCase() === u;
                 });
 
                 if (matchedDocs.length === 0) {
-                    errEl.textContent = 'اسم المستخدم غير موجود، تأكد من الكتابة';
+                    const sampleNames = allDocs.slice(0, 3).map(d => (d.fields?.username?.stringValue || '?')).join(', ');
+                    errEl.textContent = allDocs.length === 0
+                        ? 'لا يوجد موصلون في النظام بعد'
+                        : `اسم المستخدم غير موجود. الأسماء الموجودة: ${sampleNames}`;
                     errEl.style.display = 'block';
                     btn.disabled = false;
                     document.getElementById('loginBtnText').textContent = 'دخول ⚡';
