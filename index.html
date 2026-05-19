@@ -1009,6 +1009,8 @@
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
+        const API_KEY = 'AIzaSyA2N_lsZ7yyvT1kIydXFkW_fLVFH0kQRBk';
+        const FB_BASE = 'https://firestore.googleapis.com/v1/projects/wessam-8ac1d/databases/(default)/documents';
 
         let currentDriver = null;
         let currentDriverId = null;
@@ -1097,10 +1099,10 @@
             return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // Login - محسّن يتعامل مع كل أنواع تخزين كلمة المرور
+        // Login - يستخدم REST API (يتجاوز مشكلة WebChannel 404)
         async function doLogin() {
-            const u = document.getElementById('uInput').value.trim().toLowerCase();
-            const p = document.getElementById('pInput').value.trim();
+            const uInput = document.getElementById('uInput');
+            const pInput = document.getElementById('pInput');
             const btn = document.getElementById('loginBtn');
             const errEl = document.getElementById('errMsg');
             errEl.style.display = 'none';
@@ -1113,6 +1115,8 @@
                 return;
             }
 
+            const u = uInput.value.trim().toLowerCase();
+            const p = pInput.value.trim();
             if (!u || !p) {
                 errEl.textContent = 'أدخل اسم المستخدم وكلمة المرور';
                 errEl.style.display = 'block';
@@ -1123,31 +1127,27 @@
             document.getElementById('loginBtnText').innerHTML = '<span class="spinner" style="display:inline-block;vertical-align:middle;margin-left:6px;"></span> جاري الدخول...';
 
             try {
-                // جرب البحث بالـ username الأصلي وبالأحرف الصغيرة
-                let snap = await db.collection('deliveryBoys').where('username', '==', u).get();
+                // جلب كل الموصلين عبر REST API (يتجنب WebChannel)
+                const res = await fetch(`${FB_BASE}/deliveryBoys?key=${API_KEY}`);
+                const data = await res.json();
 
-                // لو ما لقى، جرب بدون تحويل للأحرف الصغيرة
-                if (snap.empty) {
-                    const uOriginal = document.getElementById('uInput').value.trim();
-                    snap = await db.collection('deliveryBoys').where('username', '==', uOriginal).get();
+                if (data.error) {
+                    errEl.textContent = 'خطأ في الاتصال: ' + data.error.message;
+                    errEl.style.display = 'block';
+                    btn.disabled = false;
+                    document.getElementById('loginBtnText').textContent = 'دخول ⚡';
+                    return;
                 }
 
-                // لو ما لقى برضو، اجلب كل الموصلين وابحث يدوياً (حل للمشكلة الرئيسية)
-                if (snap.empty) {
-                    const allSnap = await db.collection('deliveryBoys').get();
-                    const uOriginal = document.getElementById('uInput').value.trim();
-                    const matched = allSnap.docs.filter(d => {
-                        const storedUser = (d.data().username || '').trim();
-                        return storedUser === uOriginal || storedUser.toLowerCase() === u;
-                    });
-                    if (matched.length > 0) {
-                        // أعد بناء snap وهمي
-                        snap = { empty: false, docs: matched };
-                    }
-                }
+                // البحث عن الموصل المطابق
+                const uOriginal = uInput.value.trim();
+                const matchedDocs = (data.documents || []).filter(doc => {
+                    const f = doc.fields || {};
+                    const storedUser = (f.username?.stringValue || '').trim();
+                    return storedUser === uOriginal || storedUser.toLowerCase() === u;
+                });
 
-                if (snap.empty) {
-                    // اسم المستخدم غير موجود - لكن لا نزيد العداد (قد يكون خطأ إملائي)
+                if (matchedDocs.length === 0) {
                     errEl.textContent = 'اسم المستخدم غير موجود، تأكد من الكتابة';
                     errEl.style.display = 'block';
                     btn.disabled = false;
@@ -1155,13 +1155,13 @@
                     return;
                 }
 
-                const docData = snap.docs[0].data();
-                const docId = snap.docs[0].id;
-                const storedPass = docData.password || '';
-                let match = false;
+                const doc = matchedDocs[0];
+                const fields = doc.fields || {};
+                const docId = doc.name.split('/').pop();
+                const storedPass = fields.password?.stringValue || '';
 
-                // جرب كل الطرق الممكنة لمطابقة كلمة المرور
-                const pOriginal = document.getElementById('pInput').value.trim();
+                // مقارنة كلمة المرور
+                const pOriginal = pInput.value.trim();
                 let hashedP = '', hashedPLower = '';
                 try {
                     hashedP = await _hashPass(pOriginal);
@@ -1170,6 +1170,7 @@
                     console.error('Hash error:', hashErr);
                 }
 
+                let match = false;
                 if (storedPass.length === 64) {
                     match = (hashedP === storedPass) || (hashedPLower === storedPass);
                     if (!match) match = (pOriginal === storedPass);
@@ -1179,14 +1180,13 @@
                 }
 
                 if (!match) {
-                    console.log('DEBUG: storedPass length=', storedPass.length, 'stored=', storedPass.substring(0,16)+'...', 'hashedP=', hashedP.substring(0,16)+'...', 'hashedPLower=', hashedPLower.substring(0,16)+'...', 'match=', match);
                     _lAttempts.count++;
                     if (_lAttempts.count >= _MAX_ATT) {
                         _lAttempts.lockedUntil = Date.now() + _LOCK_MS;
                         _lAttempts.count = 0;
                         errEl.textContent = 'تم تجاوز عدد المحاولات. حاول بعد 10 دقائق.';
                     } else {
-                        errEl.textContent = `كلمة المرور غير صحيحة (حاول مرة أخرى)`;
+                        errEl.textContent = 'كلمة المرور غير صحيحة (حاول مرة أخرى)';
                     }
                     errEl.style.display = 'block';
                     btn.disabled = false;
@@ -1194,7 +1194,15 @@
                     return;
                 }
 
-                // نجح الدخول
+                // نجح الدخول — نبني object بنفس شكل SDK
+                const docData = {};
+                for (const [k, v] of Object.entries(fields)) {
+                    if (v.stringValue !== undefined) docData[k] = v.stringValue;
+                    else if (v.booleanValue !== undefined) docData[k] = v.booleanValue;
+                    else if (v.integerValue !== undefined) docData[k] = Number(v.integerValue);
+                    else if (v.doubleValue !== undefined) docData[k] = Number(v.doubleValue);
+                }
+
                 _lAttempts.count = 0;
                 currentDriverId = docId;
                 currentDriver = docData;
@@ -1202,10 +1210,7 @@
 
             } catch (e) {
                 console.error('Login error:', e);
-                const msg = e.code === 'permission-denied'
-                    ? 'صلاحيات قاعدة البيانات غير كافية، تواصل مع مدير النظام'
-                    : (e.message || 'خطأ في الاتصال، تأكد من الإنترنت وحاول مجدداً');
-                errEl.textContent = msg;
+                errEl.textContent = 'خطأ في الاتصال، تأكد من الإنترنت وحاول مجدداً';
                 errEl.style.display = 'block';
                 btn.disabled = false;
                 document.getElementById('loginBtnText').textContent = 'دخول ⚡';
