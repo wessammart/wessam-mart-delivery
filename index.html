@@ -1,236 +1,1453 @@
 <!DOCTYPE html>
-<html dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>وسام مارت — الموصلين</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:system-ui,sans-serif;background:#0f172a;color:#fff;min-height:100vh;overflow-x:hidden}
-:root{--primary:#3b82f6;--primary-light:#60a5fa;--bg:#0f172a;--card:#1e293b;--muted:#94a3b8;--border:#334155;--success:#22c55e;--danger:#ef4444}
-input,select,textarea{width:100%;padding:10px 14px;border-radius:8px;border:1px solid var(--border);background:var(--bg);color:#fff;font-size:14px}
-input:focus{outline:2px solid var(--primary);border-color:transparent}
-button{cursor:pointer;font-weight:bold;border:none;border-radius:8px;padding:10px 20px;font-size:14px;transition:.2s}
-.btn-primary{background:linear-gradient(135deg,var(--primary),var(--primary-light));color:#fff;width:100%}
-.btn-primary:disabled{opacity:.5;cursor:not-allowed}
-.btn-danger{background:var(--danger);color:#fff}
-.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}
-.spinner{display:inline-block;width:16px;height:16px;border:2px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-.screen{display:none;padding:20px;max-width:500px;margin:auto}
-.screen.active{display:flex;flex-direction:column;min-height:100vh}
-#loginScreen{justify-content:center;align-items:center;gap:20px;text-align:center}
-.logo{font-size:2.5rem;font-weight:900;background:linear-gradient(135deg,var(--primary),var(--primary-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px}
-.card{background:var(--card);border-radius:16px;padding:24px;width:100%;max-width:400px}
-.card h2{font-size:18px;margin-bottom:16px;text-align:center}
-.form-group{margin-bottom:12px}
-.form-group label{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
-.err{color:var(--danger);font-size:13px;display:none;margin-top:8px;text-align:center}
-.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
-.stat-card{background:var(--bg);border-radius:12px;padding:12px;text-align:center}
-.stat-card .num{font-size:24px;font-weight:bold;color:var(--primary)}
-.stat-card .lbl{font-size:11px;color:var(--muted);margin-top:4px}
-.order-card{background:var(--card);border-radius:12px;padding:16px;margin-bottom:12px}
-.order-card .header{display:flex;justify-content:space-between;margin-bottom:8px}
-.order-card .name{font-weight:bold}
-.order-card .status{font-size:12px;padding:2px 8px;border-radius:20px}
-.status-pending{background:#f59e0b33;color:#f59e0b}
-.status-accepted{background:#22c55e33;color:#22c55e}
-.status-delivered{background:#3b82f633;color:#3b82f6}
-.status-cancelled{background:#ef444433;color:#ef4444}
-.msg-bubble{background:var(--bg);border-radius:12px;padding:10px;margin:6px 0;max-width:85%}
-.msg-driver{margin-left:auto;background:var(--primary);color:#fff}
-.msg-customer{margin-right:auto;background:var(--card)}
-.msg-time{font-size:10px;color:var(--muted);margin-top:4px}
-.hidden{display:none!important}
-.top-bar{display:flex;justify-content:space-between;align-items:center;padding:12px 0;margin-bottom:12px}
-.top-bar h1{font-size:20px}
-.top-bar .info{font-size:12px;color:var(--muted)}
-</style>
-</head><body>
+<html lang="ar" dir="rtl">
 
-<div class="screen active" id="loginScreen">
-  <div class="logo">وسام مارت</div>
-  <p style="color:var(--muted);margin-bottom:16px;font-size:14px">بوابة الموصلين</p>
-  <div class="card">
-    <h2>تسجيل الدخول</h2>
-    <div class="form-group"><label>اسم المستخدم</label><input id="uInput" placeholder="أدخل اسم المستخدم" autocomplete="off"></div>
-    <div class="form-group"><label>كلمة المرور</label><input id="pInput" type="password" placeholder="أدخل كلمة المرور"></div>
-    <div class="err" id="errMsg"></div>
-    <button class="btn-primary" id="loginBtn" onclick="doLogin()" style="margin-top:12px"><span id="loginBtnText">دخول ⚡</span></button>
-  </div>
-</div>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>وسام مارت - بوابة الموصلين</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Almarai:wght@300;400;700;800&family=Tajawal:wght@400;500;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --bg: #07090F;
+            --bg2: #0F1520;
+            --card: #141D2E;
+            --card2: #1A2540;
+            --border: #1E2D45;
+            --text: #F0F4FF;
+            --muted: #6B7FA3;
+            --green: #00D68F;
+            --green-dim: rgba(0, 214, 143, 0.12);
+            --blue: #3B9EFF;
+            --blue-dim: rgba(59, 158, 255, 0.12);
+            --yellow: #FFB800;
+            --yellow-dim: rgba(255, 184, 0, 0.12);
+            --purple: #9B6BFF;
+            --purple-dim: rgba(155, 107, 255, 0.12);
+            --red: #FF4D6A;
+            --red-dim: rgba(255, 77, 106, 0.12);
+        }
 
-<div class="screen" id="dashboard">
-  <div class="top-bar">
-    <div><h1>🚚 الطلبات</h1></div>
-    <div class="info" id="driverInfo"></div>
-  </div>
-  <button class="btn-outline" onclick="fetchOrders()" style="width:auto;margin-bottom:12px">🔄 تحديث</button>
-  <div id="ordersList"><p style="color:var(--muted);text-align:center">اسحب لتحديث الطلبات</p></div>
-</div>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<script>
-// ==================== REST API Helper ====================
-const PID = 'wessam2', KEY = atob('QUl6YVN5QkdNLU9SdlRWNGp1eFBmaUE4TWI3VmIyNV8wRVFjaEVZ');
-const BASE = `https://firestore.googleapis.com/v1/projects/${PID}/databases/(default)/documents`;
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
 
-async function apiGet(path) {
-  let url = `${BASE}/${path}?key=${KEY}`;
-  const r = await fetch(url);
-  if (r.status === 429) throw new Error('الحد مسموح تجاوز، حاول بعد دقيقة');
-  const d = await r.json();
-  if (d.error) throw new Error(d.error.message);
-  return d;
-}
+        /* ===== LOGIN ===== */
+        #loginScreen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(ellipse at 30% 20%, rgba(59, 158, 255, 0.08) 0%, transparent 55%),
+                radial-gradient(ellipse at 70% 80%, rgba(0, 214, 143, 0.07) 0%, transparent 55%),
+                var(--bg);
+            padding: 20px;
+        }
 
-async function apiAdd(collection, data) {
-  const r = await fetch(`${BASE}/${collection}?key=${KEY}`,{
-    method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:toFields(data)})
-  });
-  const d = await r.json();
-  if (d.error) throw new Error(d.error.message);
-  return d;
-}
+        .login-box {
+            width: 100%;
+            max-width: 400px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 40px 32px;
+            text-align: center;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.5);
+            position: relative;
+            overflow: hidden;
+        }
 
-async function apiUpdate(collection, docId, data) {
-  const r = await fetch(`${BASE}/${collection}/${docId}?key=${KEY}`,{
-    method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({fields:toFields(data)})
-  });
-  const d = await r.json();
-  if (d.error) throw new Error(d.error.message);
-  return d;
-}
+        .login-box::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(59, 158, 255, 0.15) 0%, transparent 70%);
+            pointer-events: none;
+        }
 
-function toFields(obj){
-  const f={};
-  for(const[k,v]of Object.entries(obj||{})){
-    if(v===null||v===undefined)f[k]={nullValue:null};
-    else if(typeof v==='string')f[k]={stringValue:v};
-    else if(typeof v==='boolean')f[k]={booleanValue:v};
-    else if(typeof v==='number')f[k]=Number.isInteger(v)?{integerValue:String(v)}:{doubleValue:v};
-    else if(typeof v==='object'&&v.constructor===Date)f[k]={timestampValue:v.toISOString()};
-    else if(Array.isArray(v))f[k]={arrayValue:{values:v.map(x=>({stringValue:String(x)}))}};
-    else f[k]={stringValue:String(v)};
-  }
-  return f;
-}
+        .speed-logo {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, var(--blue) 0%, var(--green) 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 30px rgba(59, 158, 255, 0.3);
+            position: relative;
+            z-index: 1;
+        }
 
-function fromFields(fields){
-  if(!fields)return{};
-  const o={};
-  for(const[k,v]of Object.entries(fields)){
-    if(v.stringValue!==undefined)o[k]=v.stringValue;
-    else if(v.booleanValue!==undefined)o[k]=v.booleanValue;
-    else if(v.integerValue!==undefined)o[k]=Number(v.integerValue);
-    else if(v.doubleValue!==undefined)o[k]=v.doubleValue;
-    else if(v.timestampValue)o[k]=v.timestampValue;
-    else if(v.arrayValue)o[k]=v.arrayValue.values?v.arrayValue.values.map(x=>x.stringValue):[];
-    else if(v.nullValue!==null&&v.nullValue!==undefined)o[k]=null;
-    else if(v.mapValue)o[k]=v.mapValue.fields;
-    else o[k]=null;
-  }
-  return o;
-}
+        .speed-logo svg {
+            width: 36px;
+            height: 36px;
+            color: white;
+        }
 
-function docsFromResponse(r){return (r.documents||[]).map(d=>({id:d.name.split('/').pop(),...fromFields(d.fields)}))}
+        .login-title {
+            font-family: 'Almarai', sans-serif;
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 4px;
+            position: relative;
+            z-index: 1;
+        }
 
-// ==================== Auth ====================
-let currentDriver=null,currentDriverId=null;
+        .login-title span {
+            color: var(--blue);
+        }
 
-async function _hashPass(p){
-  const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(p));
-  return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
-}
+        .login-sub {
+            color: var(--muted);
+            font-size: 0.9rem;
+            margin-bottom: 28px;
+            position: relative;
+            z-index: 1;
+        }
 
-function cacheKey(){return'_delBoys_'}
+        .inp {
+            width: 100%;
+            padding: 13px 16px;
+            background: var(--bg2);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 15px;
+            margin-bottom: 14px;
+            transition: border-color 0.2s;
+        }
 
-async function _fetchDeliveryBoys(){
-  // 1. localStorage
-  try{
-    const r=localStorage.getItem(cacheKey());
-    if(r){const p=JSON.parse(r);if(p.docs&&p.docs.length)return p.docs;}
-  }catch(e){}
-  // 2. REST API
-  const r=await apiGet('deliveryBoys');
-  const docs=docsFromResponse(r);
-  try{localStorage.setItem(cacheKey(),JSON.stringify({ts:Date.now(),docs}))}catch(e){}
-  return docs;
-}
+        .inp:focus {
+            outline: none;
+            border-color: var(--blue);
+        }
 
-async function doLogin(){
-  const u=document.getElementById('uInput').value.trim();
-  const p=document.getElementById('pInput').value.trim();
-  const btn=document.getElementById('loginBtn');
-  const err=document.getElementById('errMsg');
-  err.style.display='none';
-  if(!u||!p){err.textContent='أدخل اسم المستخدم وكلمة المرور';err.style.display='block';return}
-  btn.disabled=true;document.getElementById('loginBtnText').innerHTML='<span class="spinner"></span>';
-  try{
-    const boys=await _fetchDeliveryBoys();
-    const match=boys.filter(d=>d.username===u||d.username.toLowerCase()===u.toLowerCase());
-    if(!match.length){err.textContent='اسم المستخدم غير موجود';err.style.display='block';btn.disabled=false;document.getElementById('loginBtnText').textContent='دخول ⚡';return}
-    const md=match[0],sp=md.password||'';
-    let ok=sp===p||sp===p.trim();
-    if(sp.length===64){
-      const hp=await _hashPass(p),hpl=await _hashPass(p.toLowerCase());
-      ok=hp===sp||hpl===sp;
-    }
-    if(!ok){err.textContent='كلمة المرور غير صحيحة';err.style.display='block';btn.disabled=false;document.getElementById('loginBtnText').textContent='دخول ⚡';return}
-    currentDriverId=md.id;currentDriver=md;
-    document.getElementById('loginScreen').classList.remove('active');
-    document.getElementById('dashboard').classList.add('active');
-    document.getElementById('driverInfo').textContent=md.fullName+' | '+md.phone;
-    fetchOrders();
-  }catch(e){
-    err.textContent=e.message||'خطأ في الاتصال';
-    err.style.display='block';btn.disabled=false;
-    document.getElementById('loginBtnText').textContent='دخول ⚡';
-  }
-}
+        .btn-login {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--blue) 0%, #1A7AFF 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 800;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 8px 25px rgba(59, 158, 255, 0.3);
+        }
 
-// ==================== Orders ====================
-async function fetchOrders(){
-  const el=document.getElementById('ordersList');
-  el.innerHTML='<p style="text-align:center;color:var(--muted)"><span class="spinner"></span> جاري التحميل...</p>';
-  try{
-    const r=await apiGet('orders');
-    let orders=docsFromResponse(r);
-    orders.sort((a,b)=>(b.createdAt||'').localeCompare(a.createdAt||''));
-    // filter: deliveryBoyId matches currentDriverId OR driver is null/available
-    const myOrders=orders.filter(o=>{
-      if(o.deliveryBoyId===currentDriverId)return true;
-      if(!o.deliveryBoyId||o.deliveryBoyId===''||o.status==='pending'||o.status==='preparing')return true;
-      return false;
-    });
-    if(!myOrders.length){el.innerHTML='<p style="color:var(--muted);text-align:center">لا توجد طلبات متاحة</p>';return}
-    el.innerHTML=myOrders.map(o=>{
-      const st=o.status||'pending';
-      const stLabels={pending:'قيد الانتظار',accepted:'قيد التوصيل',delivered:'تم التوصيل',cancelled:'ملغي'};
-      return `<div class="order-card">
-        <div class="header"><span class="name">${o.customerName||'عميل'}</span><span class="status status-${st}">${stLabels[st]||st}</span></div>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:4px">${o.address||'بدون عنوان'}</p>
-        <p style="font-size:13px;color:var(--muted);margin-bottom:8px">المجموع: ${o.total||'?'} ريال</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">${actionBtns(o)}</div>
-      </div>`;
-    }).join('');
-  }catch(e){el.innerHTML=`<p style="color:var(--danger);text-align:center">${e.message}</p>`}
-}
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(59, 158, 255, 0.45);
+        }
 
-function actionBtns(o){
-  const id=o.id;
-  if(o.deliveryBoyId===currentDriverId&&o.status==='accepted')return `<button class="btn-primary" onclick="updateOrder('${id}','delivered')" style="flex:1">✅ تم التوصيل</button>
-    <button class="btn-danger" onclick="updateOrder('${id}','cancelled')" style="flex:1">❌ إلغاء</button>`;
-  if((!o.deliveryBoyId||o.deliveryBoyId==='')&&(o.status==='pending'||o.status==='preparing'||!o.status))return `<button class="btn-primary" onclick="updateOrder('${id}','accepted')" style="flex:1">🚚 أقبل التوصيل</button>`;
-  if(o.deliveryBoyId===currentDriverId&&o.status==='delivered')return `<span style="color:var(--success);font-size:13px">✅ تم التوصيل</span>`;
-  if(o.deliveryBoyId===currentDriverId&&o.status==='cancelled')return `<span style="color:var(--danger);font-size:13px">❌ ملغي</span>`;
-  return `<span style="color:var(--muted);font-size:12px">موصل آخر: ${o.deliveryBoyId}</span>`;
-}
+        .btn-login:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
 
-async function updateOrder(id,status){
-  try{
-    const data={status};
-    if(status==='accepted')data.deliveryBoyId=currentDriverId;
-    await apiUpdate('orders',id,data);
-    fetchOrders();
-  }catch(e){alert('خطأ: '+e.message)}
-}
-</script>
-</body></html>
+        .action-btn.delete {
+            background: var(--red-dim);
+            color: var(--red);
+            border: 1px solid rgba(255, 77, 106, 0.3);
+        }
+
+        .action-btn.delete:hover {
+            background: rgba(255, 77, 106, 0.25);
+        }
+
+        .error-msg {
+            color: var(--red);
+            font-size: 13px;
+            margin-bottom: 10px;
+            display: none;
+        }
+
+        /* ===== DASHBOARD ===== */
+        #dashboard {
+            display: none;
+            min-height: 100vh;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .topbar {
+            background: var(--card);
+            border-bottom: 1px solid var(--border);
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            backdrop-filter: blur(20px);
+        }
+
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .topbar-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--blue), var(--green));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .topbar-icon svg {
+            width: 22px;
+            height: 22px;
+            color: white;
+        }
+
+        .topbar-title {
+            font-family: 'Almarai', sans-serif;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .topbar-name {
+            color: var(--blue);
+            font-size: 0.8rem;
+            margin-top: 1px;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background: var(--red-dim);
+            border: 1px solid var(--red);
+            color: var(--red);
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-logout:hover {
+            background: var(--red);
+            color: white;
+        }
+
+        /* Stats bar */
+        .stats-bar {
+            display: flex;
+            gap: 10px;
+            padding: 16px 20px;
+            overflow-x: auto;
+            background: var(--bg2);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stat-chip {
+            flex-shrink: 0;
+            padding: 10px 16px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid transparent;
+        }
+
+        .stat-chip.all {
+            background: var(--blue-dim);
+            border-color: rgba(59, 158, 255, 0.25);
+            color: var(--blue);
+        }
+
+        .stat-chip.new {
+            background: var(--yellow-dim);
+            border-color: rgba(255, 184, 0, 0.25);
+            color: var(--yellow);
+        }
+
+        .stat-chip.going {
+            background: var(--blue-dim);
+            border-color: rgba(59, 158, 255, 0.3);
+            color: var(--blue);
+        }
+
+        .stat-chip.done {
+            background: var(--purple-dim);
+            border-color: rgba(155, 107, 255, 0.3);
+            color: var(--purple);
+        }
+
+        .stat-chip.paid {
+            background: var(--green-dim);
+            border-color: rgba(0, 214, 143, 0.3);
+            color: var(--green);
+        }
+
+        .stat-num {
+            font-size: 18px;
+            font-weight: 900;
+        }
+
+        /* Orders */
+        .orders-area {
+            flex: 1;
+            padding: 16px 20px;
+            max-width: 700px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .section-title {
+            font-family: 'Almarai', sans-serif;
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            opacity: 0.3;
+        }
+
+        /* Order Card */
+        .order-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            margin-bottom: 14px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .order-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-header {
+            padding: 16px 18px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .customer-name {
+            font-weight: 800;
+            font-size: 1.1rem;
+            margin-bottom: 3px;
+        }
+
+        .customer-phone {
+            color: var(--muted);
+            font-size: 13px;
+            direction: ltr;
+            display: inline-block;
+        }
+
+        .customer-address {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .order-total {
+            text-align: left;
+            flex-shrink: 0;
+        }
+
+        .total-amount {
+            font-weight: 900;
+            font-size: 1.25rem;
+            color: var(--green);
+        }
+
+        .delivery-fee {
+            font-size: 11px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .s-pending {
+            background: var(--yellow-dim);
+            color: var(--yellow);
+            border: 1px solid rgba(255, 184, 0, 0.3);
+        }
+
+        .s-assigned {
+            background: var(--yellow-dim);
+            color: var(--yellow);
+            border: 1px solid rgba(255, 184, 0, 0.3);
+        }
+
+        .s-delivering {
+            background: var(--blue-dim);
+            color: var(--blue);
+            border: 1px solid rgba(59, 158, 255, 0.3);
+        }
+
+        .s-delivered {
+            background: var(--purple-dim);
+            color: var(--purple);
+            border: 1px solid rgba(155, 107, 255, 0.3);
+        }
+
+        .s-completed {
+            background: var(--green-dim);
+            color: var(--green);
+            border: 1px solid rgba(0, 214, 143, 0.3);
+        }
+
+        /* Items */
+        .card-items {
+            padding: 12px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--bg2);
+            padding: 8px 12px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            gap: 8px;
+        }
+
+        .item-name {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .item-opt {
+            font-size: 11px;
+            color: var(--purple);
+        }
+
+        .item-qty {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        /* Location */
+        .card-location {
+            padding: 12px 18px;
+        }
+
+        .loc-title {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .map-btns {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 8px;
+        }
+
+        .map-btn {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            padding: 12px 8px;
+            border-radius: 14px;
+            text-decoration: none;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 700;
+            font-size: 12px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .map-btn svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        .map-btn.android {
+            background: var(--green-dim);
+            color: var(--green);
+            border-color: rgba(0, 214, 143, 0.25);
+        }
+
+        .map-btn.ios {
+            background: var(--blue-dim);
+            color: var(--blue);
+            border-color: rgba(59, 158, 255, 0.25);
+        }
+
+        .map-btn.web {
+            background: var(--yellow-dim);
+            color: var(--yellow);
+            border-color: rgba(255, 184, 0, 0.25);
+        }
+
+        .map-btn:hover {
+            filter: brightness(1.2);
+            transform: scale(1.03);
+        }
+
+        .no-location {
+            color: var(--muted);
+            font-size: 12px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        /* Payment */
+        .card-payment {
+            padding: 8px 18px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .pay-badge {
+            padding: 5px 12px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .pay-cash {
+            background: var(--blue-dim);
+            color: var(--blue);
+            border: 1px solid rgba(59, 158, 255, 0.3);
+        }
+
+        .pay-transfer {
+            background: var(--red-dim);
+            color: var(--red);
+            border: 1px solid rgba(255, 77, 106, 0.3);
+        }
+
+        .pay-paid {
+            background: var(--green-dim);
+            color: var(--green);
+            border: 1px solid rgba(0, 214, 143, 0.3);
+        }
+
+        .pay-unpaid {
+            background: var(--yellow-dim);
+            color: var(--yellow);
+            border: 1px solid rgba(255, 184, 0, 0.3);
+        }
+
+        /* Actions */
+        .card-actions {
+            padding: 12px 18px 16px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 12px 10px;
+            border: none;
+            border-radius: 14px;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .action-btn.start {
+            background: linear-gradient(135deg, var(--blue), #1A7AFF);
+            color: white;
+            box-shadow: 0 6px 20px rgba(59, 158, 255, 0.3);
+        }
+
+        .action-btn.complete {
+            background: linear-gradient(135deg, var(--purple), #7C4DFF);
+            color: white;
+            box-shadow: 0 6px 20px rgba(155, 107, 255, 0.3);
+        }
+
+        .action-btn.confirm-pay {
+            background: linear-gradient(135deg, var(--green), #00B87A);
+            color: white;
+            box-shadow: 0 6px 20px rgba(0, 214, 143, 0.3);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+
+        .action-btn:active {
+            transform: scale(0.97);
+        }
+
+        .action-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Chat Modal */
+        .chat-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .chat-modal-overlay.open {
+            display: flex;
+        }
+
+        .chat-modal-box {
+            background: var(--card2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 460px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: var(--bg);
+        }
+
+        .chat-input-row {
+            padding: 12px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 10px 14px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-family: 'Tajawal', sans-serif;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: var(--blue);
+        }
+
+        .chat-send-btn {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, var(--blue), #1A7AFF);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Tajawal', sans-serif;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .msg-customer {
+            align-self: flex-start;
+            max-width: 75%;
+            padding: 9px 13px;
+            border-radius: 14px 14px 14px 4px;
+            background: var(--card);
+            color: var(--text);
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .msg-driver {
+            align-self: flex-end;
+            max-width: 75%;
+            padding: 9px 13px;
+            border-radius: 14px 14px 4px 14px;
+            background: linear-gradient(135deg, var(--blue), #1A7AFF);
+            color: white;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .msg-time {
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 3px;
+        }
+
+        .btn-chat {
+            background: linear-gradient(135deg, rgba(59, 158, 255, 0.15), rgba(59, 158, 255, 0.1));
+            border: 1px solid rgba(59, 158, 255, 0.4);
+            color: var(--blue);
+        }
+
+        .unread-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--red);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 28px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            padding: 13px 28px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            font-family: 'Tajawal', sans-serif;
+            z-index: 9999;
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .toast.ok {
+            background: var(--green);
+            color: #07090F;
+            box-shadow: 0 10px 30px rgba(0, 214, 143, 0.35);
+        }
+
+        .toast.err {
+            background: var(--red);
+            color: white;
+            box-shadow: 0 10px 30px rgba(255, 77, 106, 0.35);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* Pulse animation for pending */
+        @keyframes pulse-border {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 184, 0, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 6px rgba(255, 184, 0, 0);
+            }
+        }
+
+        .order-card.is-pending {
+            animation: pulse-border 2.5s infinite;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media(max-width:480px) {
+            .orders-area {
+                padding: 10px;
+            }
+
+            .map-btns {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
+
+            .card-header {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .order-total {
+                display: flex;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .action-btn {
+                font-size: 12px;
+                padding: 10px 8px;
+                min-width: 0;
+            }
+
+            .customer-name {
+                font-size: 1rem;
+            }
+
+            .total-amount {
+                font-size: 1rem;
+            }
+
+            .topbar {
+                padding: 10px 14px;
+            }
+
+            .login-box {
+                padding: 28px 20px;
+            }
+        }
+
+        @media(max-width:360px) {
+            .map-btns {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .action-btn {
+                font-size: 11px;
+            }
+        }
+    </style>
+    <base target="_blank">
+</head>
+
+<body>
+
+    <div class="toast" id="toast"></div>
+
+    <!-- شاشة الدخول -->
+    <div id="loginScreen">
+        <div class="login-box">
+            <div class="speed-logo">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 10V3L4 14h7v7l9-11h-7z" />
+                </svg>
+            </div>
+            <h1 class="login-title">وسام <span>مارت</span></h1>
+            <p class="login-sub">بوابة الموصلين ⚡</p>
+            <input type="text" id="uInput" class="inp" placeholder="اسم المستخدم" autocomplete="username">
+            <input type="password" id="pInput" class="inp" placeholder="كلمة المرور" autocomplete="current-password">
+            <p class="error-msg" id="errMsg">بيانات الدخول غير صحيحة</p>
+            <button class="btn-login" id="loginBtn" onclick="doLogin()">
+                <span id="loginBtnText">دخول ⚡</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- لوحة الموصل -->
+    <div id="dashboard">
+        <!-- Header -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <div class="topbar-icon">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
+                </div>
+                <div>
+                    <div class="topbar-title">وسام مارت ⚡</div>
+                    <div class="topbar-name" id="driverName">-</div>
+                </div>
+            </div>
+            <button class="btn-logout" onclick="doLogout()">خروج</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-bar">
+            <div class="stat-chip all"><span class="stat-num" id="stat-all">0</span> إجمالي</div>
+            <div class="stat-chip new"><span class="stat-num" id="stat-new">0</span> جديد ⏳</div>
+            <div class="stat-chip going"><span class="stat-num" id="stat-going">0</span> بالطريق 🚀</div>
+            <div class="stat-chip done"><span class="stat-num" id="stat-done">0</span> وصل 📦</div>
+            <div class="stat-chip paid"><span class="stat-num" id="stat-paid">0</span> مكتمل ✅</div>
+        </div>
+
+        <!-- Orders -->
+        <div class="orders-area">
+            <div class="section-title">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="22" height="22">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                طلباتي
+            </div>
+            <div id="ordersList">
+                <div class="empty-state">
+                    <div class="spinner" style="margin:0 auto 16px;width:36px;height:36px;border-width:3px;"></div>
+                    <p>جاري تحميل الطلبات...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- مودال الشات -->
+    <div class="chat-modal-overlay" id="chatModal">
+        <div class="chat-modal-box">
+            <div class="chat-header">
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <div
+                        style="width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--green));display:flex;align-items:center;justify-content:center;font-size:18px;">
+                        👤</div>
+                    <div>
+                        <p id="chatCustomerName" style="font-weight:800;color:var(--text);font-size:14px;">العميل</p>
+                        <p style="font-size:11px;color:var(--green);">محادثة الطلب</p>
+                    </div>
+                </div>
+                <button onclick="closeChatModal()"
+                    style="color:var(--muted);font-size:22px;background:none;border:none;cursor:pointer;">&times;</button>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div style="text-align:center;color:var(--muted);font-size:12px;padding:8px;">لا توجد رسائل بعد</div>
+            </div>
+            <div class="chat-input-row">
+                <input class="chat-input" id="chatInput" type="text" placeholder="اكتب ردك للعميل..."
+                    onkeydown="if(event.key==='Enter')sendDriverMessage()">
+                <button class="chat-send-btn" onclick="sendDriverMessage()">إرسال</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyA2N_lsZ7yyvT1kIydXFkW_fLVFH0kQRBk",
+            authDomain: "wessam-8ac1d.firebaseapp.com",
+            projectId: "wessam-8ac1d",
+            storageBucket: "wessam-8ac1d.firebasestorage.app",
+            messagingSenderId: "140878579052",
+            appId: "1:140878579052:web:53a52b34a176171cf6df49"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        let currentDriver = null;
+        let currentDriverId = null;
+        let ordersUnsub = null;
+        let allProducts = [];
+
+        // جلب المنتجات مرة واحدة
+        db.collection('products').onSnapshot(snap => {
+            allProducts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        });
+
+        // Toast
+        function toast(msg, isErr) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.className = 'toast ' + (isErr ? 'err' : 'ok');
+            requestAnimationFrame(() => t.classList.add('show'));
+            setTimeout(() => t.classList.remove('show'), 3200);
+        }
+
+        // ===== الشات =====
+        let currentChatOrderId = null;
+        let currentChatCustomerName = null;
+        let chatUnsubscribe = null;
+
+        function openChatModal(orderId, customerName) {
+            currentChatOrderId = orderId;
+            currentChatCustomerName = customerName;
+            document.getElementById('chatCustomerName').textContent = customerName || 'العميل';
+            document.getElementById('chatModal').classList.add('open');
+            listenChatMessages(orderId);
+        }
+        window.openChatModal = openChatModal;
+
+        function closeChatModal() {
+            document.getElementById('chatModal').classList.remove('open');
+            if (chatUnsubscribe) { chatUnsubscribe(); chatUnsubscribe = null; }
+            currentChatOrderId = null;
+        }
+        window.closeChatModal = closeChatModal;
+
+        function listenChatMessages(orderId) {
+            if (chatUnsubscribe) chatUnsubscribe();
+            chatUnsubscribe = db.collection('chats').doc(orderId).collection('messages')
+                .orderBy('time', 'asc')
+                .onSnapshot(snap => {
+                    const container = document.getElementById('chatMessages');
+                    if (snap.empty) {
+                        container.innerHTML = '<div style="text-align:center;color:var(--muted);font-size:12px;padding:8px;">لا توجد رسائل بعد</div>';
+                        return;
+                    }
+                    container.innerHTML = snap.docs.map(d => {
+                        const m = d.data();
+                        const isDriver = m.sender === 'driver';
+                        const timeStr = m.time?.toDate ? m.time.toDate().toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' }) : '';
+                        return `<div class="${isDriver ? 'msg-driver' : 'msg-customer'}">
+                            ${m.text}
+                            <div class="msg-time">${timeStr}</div>
+                        </div>`;
+                    }).join('');
+                    container.scrollTop = container.scrollHeight;
+                });
+        }
+
+        window.sendDriverMessage = async () => {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (!text || !currentChatOrderId) return;
+            input.value = '';
+            try {
+                await db.collection('chats').doc(currentChatOrderId).collection('messages').add({
+                    text,
+                    sender: 'driver',
+                    senderName: currentDriver?.fullName || 'الموصل',
+                    time: new Date()
+                });
+            } catch (e) { toast('خطأ في الإرسال', true); }
+        };
+
+        // ── حماية Brute Force ──────────────────────────
+        const _lAttempts = { count: 0, lockedUntil: 0 };
+        const _MAX_ATT = 8, _LOCK_MS = 10 * 60 * 1000;
+
+        async function _hashPass(plain) {
+            const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(plain));
+            return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        // Login - محسّن يتعامل مع كل أنواع تخزين كلمة المرور
+        async function doLogin() {
+            const u = document.getElementById('uInput').value.trim().toLowerCase();
+            const p = document.getElementById('pInput').value.trim();
+            const btn = document.getElementById('loginBtn');
+            const errEl = document.getElementById('errMsg');
+            errEl.style.display = 'none';
+
+            const now = Date.now();
+            if (_lAttempts.lockedUntil > now) {
+                const mins = Math.ceil((_lAttempts.lockedUntil - now) / 60000);
+                errEl.textContent = `تم تجاوز عدد المحاولات. حاول بعد ${mins} دقيقة.`;
+                errEl.style.display = 'block';
+                return;
+            }
+
+            if (!u || !p) {
+                errEl.textContent = 'أدخل اسم المستخدم وكلمة المرور';
+                errEl.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            document.getElementById('loginBtnText').innerHTML = '<span class="spinner" style="display:inline-block;vertical-align:middle;margin-left:6px;"></span> جاري الدخول...';
+
+            try {
+                // جرب البحث بالـ username الأصلي وبالأحرف الصغيرة
+                let snap = await db.collection('deliveryBoys').where('username', '==', u).get();
+
+                // لو ما لقى، جرب بدون تحويل للأحرف الصغيرة
+                if (snap.empty) {
+                    const uOriginal = document.getElementById('uInput').value.trim();
+                    snap = await db.collection('deliveryBoys').where('username', '==', uOriginal).get();
+                }
+
+                // لو ما لقى برضو، اجلب كل الموصلين وابحث يدوياً (حل للمشكلة الرئيسية)
+                if (snap.empty) {
+                    const allSnap = await db.collection('deliveryBoys').get();
+                    const uOriginal = document.getElementById('uInput').value.trim();
+                    const matched = allSnap.docs.filter(d => {
+                        const storedUser = (d.data().username || '').trim();
+                        return storedUser === uOriginal || storedUser.toLowerCase() === u;
+                    });
+                    if (matched.length > 0) {
+                        // أعد بناء snap وهمي
+                        snap = { empty: false, docs: matched };
+                    }
+                }
+
+                if (snap.empty) {
+                    // اسم المستخدم غير موجود - لكن لا نزيد العداد (قد يكون خطأ إملائي)
+                    errEl.textContent = 'اسم المستخدم غير موجود، تأكد من الكتابة';
+                    errEl.style.display = 'block';
+                    btn.disabled = false;
+                    document.getElementById('loginBtnText').textContent = 'دخول ⚡';
+                    return;
+                }
+
+                const docData = snap.docs[0].data();
+                const docId = snap.docs[0].id;
+                const storedPass = docData.password || '';
+                let match = false;
+
+                // جرب كل الطرق الممكنة لمطابقة كلمة المرور
+                const pOriginal = document.getElementById('pInput').value.trim();
+                const hashedP = await _hashPass(pOriginal);
+                const hashedPLower = await _hashPass(pOriginal.toLowerCase());
+
+                if (storedPass.length === 64) {
+                    // مشفرة - جرب الهاش المباشر والهاش بالأحرف الصغيرة
+                    match = (hashedP === storedPass) || (hashedPLower === storedPass);
+                } else {
+                    // نص عادي - جرب مباشرة ومع/بدون مسافات
+                    match = (pOriginal === storedPass) || (pOriginal.trim() === storedPass.trim());
+                }
+
+                if (!match) {
+                    _lAttempts.count++;
+                    if (_lAttempts.count >= _MAX_ATT) {
+                        _lAttempts.lockedUntil = Date.now() + _LOCK_MS;
+                        _lAttempts.count = 0;
+                        errEl.textContent = 'تم تجاوز عدد المحاولات. حاول بعد 10 دقائق.';
+                    } else {
+                        const remaining = _MAX_ATT - _lAttempts.count;
+                        errEl.textContent = `كلمة المرور غير صحيحة (${remaining} محاولة متبقية)`;
+                    }
+                    errEl.style.display = 'block';
+                    btn.disabled = false;
+                    document.getElementById('loginBtnText').textContent = 'دخول ⚡';
+                    return;
+                }
+
+                // نجح الدخول
+                _lAttempts.count = 0;
+                currentDriverId = docId;
+                currentDriver = docData;
+                enterDashboard();
+
+            } catch (e) {
+                // خطأ في الشبكة أو Firebase - لا نعاقب المستخدم
+                console.error('Login error:', e);
+                errEl.textContent = 'خطأ في الاتصال، تأكد من الإنترنت وحاول مجدداً';
+                errEl.style.display = 'block';
+                btn.disabled = false;
+                document.getElementById('loginBtnText').textContent = 'دخول ⚡';
+            }
+        }
+
+        // Enter dashboard
+        function enterDashboard() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'flex';
+            document.getElementById('driverName').textContent = currentDriver.fullName + ' | ' + currentDriver.phone;
+            listenOrders();
+        }
+
+        // Logout
+        function doLogout() {
+            if (ordersUnsub) ordersUnsub();
+            currentDriver = null;
+            currentDriverId = null;
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('uInput').value = '';
+            document.getElementById('pInput').value = '';
+            document.getElementById('ordersList').innerHTML = '';
+        }
+
+        // Listen to orders in real-time
+        function listenOrders() {
+            if (ordersUnsub) ordersUnsub();
+            ordersUnsub = db.collection('orders')
+                .where('deliveryBoyId', '==', currentDriverId)
+                .onSnapshot(snap => {
+                    const orders = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                    // Sort: pending/assigned first, then delivering, then delivered, then completed
+                    const priority = { pending: 0, assigned: 0, delivering: 1, delivered: 2, completed: 3 };
+                    orders.sort((a, b) => (priority[a.status] || 0) - (priority[b.status] || 0));
+                    updateStats(orders);
+                    renderOrders(orders);
+                });
+        }
+
+        // Stats
+        function updateStats(orders) {
+            document.getElementById('stat-all').textContent = orders.length;
+            document.getElementById('stat-new').textContent = orders.filter(o => o.status === 'pending' || o.status === 'assigned').length;
+            document.getElementById('stat-going').textContent = orders.filter(o => o.status === 'delivering').length;
+            document.getElementById('stat-done').textContent = orders.filter(o => o.status === 'delivered').length;
+            document.getElementById('stat-paid').textContent = orders.filter(o => o.status === 'completed').length;
+        }
+
+        // Render orders
+        function renderOrders(orders) {
+            const list = document.getElementById('ordersList');
+            if (!orders.length) {
+                list.innerHTML = `<div class="empty-state">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+      </svg>
+      <p style="font-weight:700;margin-bottom:6px;">لا توجد طلبات مسندة لك</p>
+      <p style="font-size:13px;">سيتم إشعارك فور تعيين طلب جديد</p>
+    </div>`;
+                return;
+            }
+            list.innerHTML = orders.map(o => buildCard(o)).join('');
+        }
+
+        // Status info
+        function statusInfo(s) {
+            if (s === 'pending' || s === 'assigned')
+                return { cls: 's-pending', icon: '⏳', label: 'قيد الانتظار' };
+            if (s === 'delivering')
+                return { cls: 's-delivering', icon: '🚀', label: 'بالطريق' };
+            if (s === 'delivered')
+                return { cls: 's-delivered', icon: '📦', label: 'وصل - انتظار الدفع' };
+            return { cls: 's-completed', icon: '✅', label: 'مكتمل ومدفوع' };
+        }
+
+        // Build map links
+        function mapLinks(lat, lng) {
+            if (!lat || !lng) return `<p class="no-location">📍 لا يوجد موقع محدد</p>`;
+            const androidUrl = `google.navigation:q=${lat},${lng}`;
+            const iosUrl = `comgooglemaps://?daddr=${lat},${lng}&directionsmode=driving`;
+            const webUrl = `https://www.google.com/maps/dir/?api=1&destination=${lat},${lng}&travelmode=driving`;
+            return `
+    <p class="loc-title">📍 موقع العميل — اختر التطبيق للتنقل</p>
+    <div class="map-btns">
+      <a href="${androidUrl}" class="map-btn android">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.523 15.341l1.09-1.888a.5.5 0 00-.866-.5l-1.104 1.912A7.956 7.956 0 0112 14c-1.563 0-3.023.45-4.243 1.223l.001-.001L6.655 13.31a.5.5 0 10-.866.5l1.09 1.888A8 8 0 004 22h16a8 8 0 00-2.477-6.659zM8.5 20a1 1 0 110-2 1 1 0 010 2zm7 0a1 1 0 110-2 1 1 0 010 2zM15.5 8l1.5-3h-10l1.5 3h7z"/></svg>
+        أندرويد
+      </a>
+      <a href="${iosUrl}" class="map-btn ios">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98l-.09.06c-.22.15-2.18 1.27-2.16 3.8.03 3.02 2.65 4.03 2.68 4.04l-.07.28zM13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        أيفون
+      </a>
+      <a href="${webUrl}" target="_blank" class="map-btn web">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9"/></svg>
+        ويب
+      </a>
+    </div>`;
+        }
+
+        // Build single card
+        function buildCard(o) {
+            const st = statusInfo(o.status);
+            const isPending = o.status === 'pending' || o.status === 'assigned';
+            const lat = o.location?.lat;
+            const lng = o.location?.lng;
+
+            // Items
+            const itemsHtml = o.items ? o.items.map(i => {
+                const prod = allProducts.find(p => p.name === i.name);
+                const imgHtml = prod?.image
+                    ? `<img src="${prod.image}" style="width:48px;height:48px;border-radius:10px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;" onerror="this.style.display='none'">`
+                    : `<div style="width:48px;height:48px;border-radius:10px;background:var(--bg2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;">📦</div>`;
+                return `<div class="item-row">
+      ${imgHtml}
+      <div style="flex:1;margin-right:10px;">
+        <div class="item-name">${i.name} ${i.selectedOption ? `<span class="item-opt">(${i.selectedOption})</span>` : ''}</div>
+      </div>
+      <span class="item-qty">x${i.qty}</span>
+    </div>`;
+            }).join('') : '';
+
+            // Payment badges
+            const payMethod = o.paymentMethod === 'transfer'
+                ? '<span class="pay-badge pay-transfer">💳 تحويل بنكي</span>'
+                : '<span class="pay-badge pay-cash">💵 كاش</span>';
+            const payStatus = o.deliveryPaid
+                ? '<span class="pay-badge pay-paid">✅ الحساب مدفوع</span>'
+                : '<span class="pay-badge pay-unpaid">⏳ لم يُدفع الحساب</span>';
+
+            // Action buttons
+            let actions = '';
+            if (isPending) {
+                actions = `<button class="action-btn start" onclick="startDelivery('${o.id}')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+      </svg>
+      ابدأ التوصيل
+    </button>`;
+            }
+            if (o.status === 'delivering') {
+                actions = `<button class="action-btn complete" onclick="completeDelivery('${o.id}')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+      </svg>
+      وصلت للعميل
+    </button>`;
+            }
+            if (o.status === 'delivered') {
+                actions = `<button class="action-btn confirm-pay" onclick="confirmPayment('${o.id}')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"/>
+      </svg>
+      تأكيد استلام الدفع
+    </button>`;
+            }
+
+            // زر الشات يظهر دائماً لجميع طرق الدفع
+            const chatBtn = `
+    <button class="action-btn btn-chat" onclick="openChatModal('${o.id}','${(o.name || 'العميل').replace(/'/g, "\\'")}')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+      </svg>
+      شات مع العميل
+    </button>`;
+
+            // زر الحذف - يظهر فقط للطلبات المكتملة
+            const deleteBtn = o.status === 'completed' ? `
+    <button class="action-btn delete" onclick="deleteOrder('${o.id}')">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="18" height="18">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+      </svg>
+      حذف الطلب
+    </button>` : '';
+
+            return `
+    <div class="order-card ${isPending ? 'is-pending' : ''}">
+      <!-- Header -->
+      <div class="card-header">
+        <div>
+          <div class="customer-name">${o.name || 'بدون اسم'}</div>
+          <div class="customer-phone">${o.phone || ''}</div>
+          <div class="customer-address">${o.addressText || ''}</div>
+          <div style="margin-top:6px;">
+            <span class="status-badge ${st.cls}">${st.icon} ${st.label}</span>
+          </div>
+        </div>
+        <div class="order-total">
+          <div class="total-amount">${o.total || 0} ريال</div>
+          <div class="delivery-fee">رسوم التوصيل: ${o.deliveryFee || 0} ريال</div>
+        </div>
+      </div>
+
+      <!-- Items -->
+      ${itemsHtml ? `<div class="card-items">${itemsHtml}</div>` : ''}
+
+      <!-- Map -->
+      <div class="card-location">${mapLinks(lat, lng)}</div>
+
+      <!-- Payment -->
+      <div class="card-payment">${payMethod} ${payStatus}</div>
+
+      <!-- Actions -->
+      ${(actions || chatBtn || deleteBtn) ? `<div class="card-actions">${actions}${chatBtn}${deleteBtn}</div>` : ''}
+    </div>`;
+        }
+
+        // Actions
+        async function startDelivery(id) {
+            try {
+                await db.collection('orders').doc(id).update({ status: 'delivering', deliveryStartedAt: new Date() });
+                await db.collection('deliveryBoys').doc(currentDriverId).update({ status: 'busy' });
+                toast('🚀 تم بدء التوصيل!');
+            } catch (e) { toast('خطأ في التحديث', true); }
+        }
+
+        async function completeDelivery(id) {
+            try {
+                await db.collection('orders').doc(id).update({ status: 'delivered', deliveryCompletedAt: new Date() });
+                toast('📦 تم التوصيل! انتظر تأكيد الدفع');
+            } catch (e) { toast('خطأ', true); }
+        }
+
+        async function confirmPayment(id) {
+            try {
+                const snap = await db.collection('orders').doc(id).get();
+                if (!snap.exists) return;
+                await db.collection('orders').doc(id).update({ status: 'completed', deliveryPaid: true, paymentReceivedAt: new Date() });
+                const dRef = db.collection('deliveryBoys').doc(currentDriverId);
+                const dSnap = await dRef.get();
+                const prev = dSnap.data().totalDeliveries || 0;
+                await dRef.update({ totalDeliveries: prev + 1, status: 'available' });
+                toast('✅ تم تأكيد الدفع وإتمام الطلب!');
+            } catch (e) { toast('خطأ', true); }
+        }
+
+        async function deleteOrder(id) {
+            if (!confirm('هل تريد حذف هذا الطلب؟\nلا يمكن التراجع عن الحذف.')) return;
+            try {
+                await db.collection('orders').doc(id).delete();
+                toast('🗑️ تم حذف الطلب');
+            } catch (e) { toast('خطأ في الحذف', true); }
+        }
+
+        // Enter key
+        document.getElementById('pInput').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+        document.getElementById('uInput').addEventListener('keydown', e => { if (e.key === 'Enter') document.getElementById('pInput').focus(); });
+    </script>
+</body>
+
+</html>
