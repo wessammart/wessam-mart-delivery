@@ -999,20 +999,20 @@
 
     <script>
         const firebaseConfig = {
-            apiKey: "AIzaSyA2N_lsZ7yyvT1kIydXFkW_fLVFH0kQRBk",
-            authDomain: "wessam-8ac1d.firebaseapp.com",
-            projectId: "wessam-8ac1d",
-            storageBucket: "wessam-8ac1d.firebasestorage.app",
-            messagingSenderId: "140878579052",
-            appId: "1:140878579052:web:53a52b34a176171cf6df49"
+            apiKey: "AIzaSyBGM-ORvTV4juxPfiA8Mb7Vb25_0EQchEY",
+            authDomain: "wessam2.firebaseapp.com",
+            projectId: "wessam2",
+            storageBucket: "wessam2.firebasestorage.app",
+            messagingSenderId: "466094881498",
+            appId: "1:466094881498:web:1c9cd76039537c307583e3"
         };
 
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
         // persistence عشان يقدر يجيب البيانات من الكاش حتى لو النت ضعيف
         try { db.enablePersistence({ synchronizeTabs: true }); } catch(e) {}
-        const API_KEY = 'AIzaSyA2N_lsZ7yyvT1kIydXFkW_fLVFH0kQRBk';
-        const FB_BASE = 'https://firestore.googleapis.com/v1/projects/wessam-8ac1d/databases/(default)/documents';
+        const API_KEY = 'AIzaSyBGM-ORvTV4juxPfiA8Mb7Vb25_0EQchEY';
+        const FB_BASE = 'https://firestore.googleapis.com/v1/projects/wessam2/databases/(default)/documents';
 
         let currentDriver = null;
         let currentDriverId = null;
