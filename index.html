@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 
 <head>
@@ -988,6 +988,7 @@
             appId: "1:140878579052:web:53a52b34a176171cf6df49"
         });
         const db = firebase.firestore();
+        db.settings({ experimentalForceLongPolling: true, merge: true });
         const MAX_IMG = 2 * 1024 * 1024;
 
         const storeLabels = {
@@ -1475,3 +1476,4 @@
 </body>
 
 </html>
+
